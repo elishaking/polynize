@@ -3,7 +3,7 @@ from itertools import zip_longest
 
 class Polynomial:
     def __init__(self, *args, **kwargs):
-        self.args = args[0]
+        self.args = list(args)
         if kwargs.__contains__("order"):
             self.args = []
             for i in range(kwargs["order"] + 1):
@@ -57,7 +57,6 @@ class Polynomial:
 
         return Polynomial(*result)
 
-
     @staticmethod
     def new_array(min_len: int, max_len: int, arr: list) -> list:
         """
@@ -73,13 +72,14 @@ class Polynomial:
         return new_arr
 
     def __add__(self, other):
-        self.add_or_subtract(self.args, other.args, 0)
+        return self.add_or_subtract(self.args, other.args, 0)
 
-    def __str__(self):
-        return str('Polynomial({0})'.format(self.args))
+    def __sub__(self, other):
+        return self.add_or_subtract(self.args, other.args, 1)
 
-    def __len__(self):
-        return len(self.args)
+    def __neg__(self):
+        self.args = [-arg for arg in self.args]
+        return self
 
     @staticmethod
     def multiply_polynomial(cp1: float, op1: float, cp2: float, op2: float):
@@ -95,7 +95,14 @@ class Polynomial:
 
         return total_after_multiplication
 
-    def __div__(self, other):
+    def __pow__(self, power, modulo=None):
+        exponent = Polynomial(1)
+        for i in range(power):
+            exponent *= self
+
+        return exponent
+
+    def __truediv__(self, other):
         i = 0
         quotient = []
         dividend = self.args
@@ -110,14 +117,21 @@ class Polynomial:
                 dividend = [x - y for x, y in zip_longest(dividend, current_remainder, fillvalue=0)]
                 quotient = tuple(quotient)
                 dividend = tuple(dividend)
-                return [quotient, dividend]
 
-    def __sub__(self, other):
-        self.add_or_subtract(self.args, other.args, 1)
+        return [Polynomial(*quotient), Polynomial(*dividend)]
+
+    def __mod__(self, other):
+        return self.__truediv__(other)[1]
+
+    def __str__(self):
+        return str('Polynomial({0})'.format(self.args))
+
+    def __len__(self):
+        return len(self.args)
+
 
 if __name__ == '__main__':
-    x = Polynomial([10, 10])
-    x2 = Polynomial([0])
-    print(x + x)
-    print(type(x.args))
-    print(x)
+    x = Polynomial(10, 10)
+    x2 = Polynomial(0)
+    print('x / x =', (x / x)[0])
+    print('x * x =', x)
