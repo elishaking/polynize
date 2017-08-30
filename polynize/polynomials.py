@@ -44,6 +44,7 @@ class Polynomial:
         :return: arr1 + arr2 or arr1 - arr2
         """
         # If statement to determine the smaller array(or list) between self.args and other.args
+
         if len(arr1) < len(arr2):
             min_arr = arr1
             max_arr = arr2
@@ -52,9 +53,18 @@ class Polynomial:
             max_arr = arr1
         min_arr = self.new_array(len(min_arr), len(max_arr), min_arr)
         result = []  # result is an array used to store the result
+        if len(arr1) == 1 or len(arr2) == 1:
+            if len(arr1) == 1:
+                result.append([b + arr1[0] for b in arr2]) if num == 0 else result.append([b - arr1[0] for b in arr2])
+                return Polynomial(*result)
+            elif len(arr2) == 1:
+                result.append([b + arr2[0] for b in arr1]) if num == 0 else result.append([b - arr2[0] for b in arr1])
+                return Polynomial(*result)
+            else:
+                result.append(arr1[0] + arr2[0]) if num == 0 else result.append(arr1[0]-arr2[0])
+                return Polynomial(*result)
         for i in range(len(max_arr)):
             result.append(min_arr[i] + max_arr[i]) if num == 0 else result.append(min_arr[i] - max_arr[i])
-
         return Polynomial(*result)
 
     @staticmethod
@@ -87,6 +97,16 @@ class Polynomial:
 
     def __mul__(self, other):
         total_after_multiplication = Polynomial(0)
+        if len(self.args) == 1 or len(other.args) == 1:
+            if len(self.args) == 1:
+                total_after_multiplication += [b * self.args[0] for b in other.args]
+                return Polynomial(total_after_multiplication)
+            elif len(other.args) == 1:
+                total_after_multiplication += ([b * other.args[0] for b in self.args])
+                return total_after_multiplication
+            else:
+                total_after_multiplication += (self.args[0] * other.args[0])
+                return total_after_multiplication
         for i in range(len(self)):
             mp = Polynomial(0)
             for j in range(len(other)):
@@ -106,6 +126,17 @@ class Polynomial:
         i = 0
         quotient = []
         dividend = self.args
+        if len(self.args) == 1 or len(other.args) == 1:
+            if len(self.args) == 1:
+                quotient.append([round(b / self.args[0]) for b in other.args])
+                return Polynomial(*quotient)
+            elif len(other.args) == 1:
+                quotient.append([round(b / other.args[0]) for b in self.args])
+                return Polynomial(*quotient)
+            else:
+                quotient.append(round(self.args[0] / other.args[0]))
+                return Polynomial(*quotient)
+
         for k in range(len(self.args) - 1):
             if all(a == 0 for a in dividend):
                 break
