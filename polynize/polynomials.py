@@ -96,24 +96,27 @@ class Polynomial:
         return Polynomial(coeff=cp1 * cp2, order=op1 + op2)
 
     def __mul__(self, other):
-        total_after_multiplication = Polynomial(0)
-        if len(self.args) == 1 or len(other.args) == 1:
-            if len(self.args) == 1:
-                total_after_multiplication += [b * self.args[0] for b in other.args]
-                return Polynomial(total_after_multiplication)
-            elif len(other.args) == 1:
-                total_after_multiplication += ([b * other.args[0] for b in self.args])
-                return total_after_multiplication
-            else:
-                total_after_multiplication += (self.args[0] * other.args[0])
-                return total_after_multiplication
-        for i in range(len(self)):
-            mp = Polynomial(0)
-            for j in range(len(other)):
-                mp += Polynomial.multiply_polynomial(self.args[i], len(self) - 1 - i, other.args[j], len(other) - 1 - j)
-            total_after_multiplication += mp
+        # if len(self.args) == 1 or len(other.args) == 1:
+        #     if len(self.args) == 1:
+        #         total_after_multiplication += [b * self.args[0] for b in other.args]
+        #         return Polynomial(total_after_multiplication)
+        #     elif len(other.args) == 1:
+        #         total_after_multiplication += ([b * other.args[0] for b in self.args])
+        #         return total_after_multiplication
+        #     else:
+        #         total_after_multiplication += (self.args[0] * other.args[0])
+        #         return total_after_multiplication
+        if type(other) != Polynomial:
+            return Polynomial(*[other * arg for arg in self.args])
+        else:
+            total_after_multiplication = Polynomial(0)
+            for i in range(len(self)):
+                mp = Polynomial(0)
+                for j in range(len(other)):
+                    mp += Polynomial.multiply_polynomial(self.args[i], len(self) - 1 - i, other.args[j], len(other) - 1 - j)
+                total_after_multiplication += mp
 
-        return total_after_multiplication
+            return total_after_multiplication
 
     def __pow__(self, power, modulo=None):
         exponent = Polynomial(1)
@@ -165,4 +168,4 @@ if __name__ == '__main__':
     x = Polynomial(10, 10)
     x2 = Polynomial(0)
     print('x / x =', (x / x)[0])
-    print('x * x =', x)
+    print('x * x =', x * 2)
