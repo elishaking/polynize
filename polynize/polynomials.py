@@ -129,7 +129,7 @@ class Polynomial:
             if all(a == 0 for a in dividend):
                 break
             else:
-                if len(other.args) < self.checkorder(dividend):
+                if len(other.args) <= self.checkorder(dividend):
                     quotient.append(self.nonz(dividend) / other.args[i])
                     current_quotient = self.nonz(dividend) / other.args[i]
                     current_remainder = [a * current_quotient for a in other.args]
