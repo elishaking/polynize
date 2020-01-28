@@ -21,6 +21,16 @@ class Polynomial:
                 continue
             else:
                 return arr[i]
+    def checkorder(self, arr):
+        """
+        :param arr: list
+        :return: returns the number of non-zero elements in a list
+        """
+        num = 0
+        for i in range(len(arr)):
+            if arr[i] != 0:
+                num += 1
+        return num
 
     @staticmethod
     def augment(arr1: list, arr2: list) -> list:
@@ -53,16 +63,6 @@ class Polynomial:
             max_arr = arr1
         min_arr = self.new_array(len(min_arr), len(max_arr), min_arr)
         result = []  # result is an array used to store the result
-        if len(arr1) == 1 or len(arr2) == 1:
-            if len(arr1) == 1:
-                result.append([b + arr1[0] for b in arr2]) if num == 0 else result.append([b - arr1[0] for b in arr2])
-                return Polynomial(*result)
-            elif len(arr2) == 1:
-                result.append([b + arr2[0] for b in arr1]) if num == 0 else result.append([b - arr2[0] for b in arr1])
-                return Polynomial(*result)
-            else:
-                result.append(arr1[0] + arr2[0]) if num == 0 else result.append(arr1[0]-arr2[0])
-                return Polynomial(*result)
         for i in range(len(max_arr)):
             result.append(min_arr[i] + max_arr[i]) if num == 0 else result.append(min_arr[i] - max_arr[i])
         return Polynomial(*result)
@@ -82,9 +82,13 @@ class Polynomial:
         return new_arr
 
     def __add__(self, other):
+        if type(other) != Polynomial:
+            return Polynomial(*[other + arg for arg in self.args])
         return self.add_or_subtract(self.args, other.args, 0)
 
     def __sub__(self, other):
+        if type(other) != Polynomial:
+            return Polynomial(*[arg - other for arg in self.args])
         return self.add_or_subtract(self.args, other.args, 1)
 
     def __neg__(self):
@@ -96,16 +100,6 @@ class Polynomial:
         return Polynomial(coeff=cp1 * cp2, order=op1 + op2)
 
     def __mul__(self, other):
-        # if len(self.args) == 1 or len(other.args) == 1:
-        #     if len(self.args) == 1:
-        #         total_after_multiplication += [b * self.args[0] for b in other.args]
-        #         return Polynomial(total_after_multiplication)
-        #     elif len(other.args) == 1:
-        #         total_after_multiplication += ([b * other.args[0] for b in self.args])
-        #         return total_after_multiplication
-        #     else:
-        #         total_after_multiplication += (self.args[0] * other.args[0])
-        #         return total_after_multiplication
         if type(other) != Polynomial:
             return Polynomial(*[other * arg for arg in self.args])
         else:
@@ -129,29 +123,20 @@ class Polynomial:
         i = 0
         quotient = []
         dividend = self.args
-        if len(self.args) == 1 or len(other.args) == 1:
-            if len(self.args) == 1:
-                quotient.append([round(b / self.args[0]) for b in other.args])
-                return Polynomial(*quotient)
-            elif len(other.args) == 1:
-                quotient.append([round(b / other.args[0]) for b in self.args])
-                return Polynomial(*quotient)
-            else:
-                quotient.append(round(self.args[0] / other.args[0]))
-                return Polynomial(*quotient)
-
+        if type(other) != Polynomial:
+            return Polynomial(*[arg / other for arg in self.args])
         for k in range(len(self.args) - 1):
             if all(a == 0 for a in dividend):
                 break
             else:
-                quotient.append(self.nonz(dividend) / other.args[i])
-                current_quotient = self.nonz(dividend) / other.args[i]
-                current_remainder = [a * current_quotient for a in other.args]
-                current_remainder = self.augment(current_remainder, dividend)
-                dividend = [x - y for x, y in zip_longest(dividend, current_remainder, fillvalue=0)]
-                quotient = tuple(quotient)
-                dividend = tuple(dividend)
-
+                if len(other.args) <= self.checkorder(dividend):
+                    quotient.append(self.nonz(dividend) / other.args[i])
+                    current_quotient = self.nonz(dividend) / other.args[i]
+                    current_remainder = [a * current_quotient for a in other.args]
+                    current_remainder = self.augment(current_remainder, dividend)
+                    dividend = [x - y for x, y in zip_longest(dividend, current_remainder, fillvalue=0)]
+                    quotient = tuple(quotient)
+                    dividend = tuple(dividend)
         return [Polynomial(*quotient), Polynomial(*dividend)]
 
     def __mod__(self, other):
@@ -165,7 +150,12 @@ class Polynomial:
 
 
 if __name__ == '__main__':
-    x = Polynomial(10, 10)
-    x2 = Polynomial(0)
-    print('x / x =', (x / x)[0])
-    print('x * x =', x * 2)
+    # x = Polynomial(10, 10)
+    # x2 = Polynomial(0)
+    # print('x / x =', (x / x)[0])
+    # print('x * x =', x / 2)
+    x4 = Polynomial(2,-4,-1,-3)
+    x5 = Polynomial(1,-2,-3)
+    x6 = x4 - 2
+
+    print(x6)
